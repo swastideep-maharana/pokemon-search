@@ -5,6 +5,10 @@ export interface PokemonListItem {
   url: string;
 }
 
+interface PokemonByTypeAPIResponse {
+  pokemon: { pokemon: PokemonListItem }[];
+}
+
 export function usePokemonByType(type: string) {
   const [pokemon, setPokemon] = useState<PokemonListItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -21,8 +25,8 @@ export function usePokemonByType(type: string) {
     setError(null);
     fetch(`https://pokeapi.co/api/v2/type/${type}`)
       .then((res) => res.json())
-      .then((data) => {
-        setPokemon(data.pokemon.map((p: any) => p.pokemon));
+      .then((data: PokemonByTypeAPIResponse) => {
+        setPokemon(data.pokemon.map((p) => p.pokemon));
       })
       .catch(() => setError("Failed to fetch Pokémon by type"))
       .finally(() => setLoading(false));

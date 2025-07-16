@@ -5,6 +5,10 @@ export interface PokemonListItem {
   url: string;
 }
 
+interface PokemonListAPIResponse {
+  results: PokemonListItem[];
+}
+
 export function usePokemonList(limit: number = 50, offset: number = 0) {
   const [pokemon, setPokemon] = useState<PokemonListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,9 +22,9 @@ export function usePokemonList(limit: number = 50, offset: number = 0) {
         const res = await fetch(
           `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
         );
-        const data = await res.json();
+        const data: PokemonListAPIResponse = await res.json();
         setPokemon(data.results);
-      } catch (err) {
+      } catch {
         setError("Failed to fetch Pokémon list");
       } finally {
         setLoading(false);
