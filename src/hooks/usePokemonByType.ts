@@ -1,35 +1,27 @@
 import { useEffect, useState } from "react";
 
-export interface PokemonListItem {
-  name: string;
-  url: string;
-}
-
-interface PokemonByTypeAPIResponse {
-  pokemon: { pokemon: PokemonListItem }[];
-}
-
 export function usePokemonByType(type: string) {
-  const [pokemon, setPokemon] = useState<PokemonListItem[]>([]);
+  const [pokemon, setPokemon] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!type) {
-      setPokemon([]);
-      setLoading(false);
+    if (!type) return;
+    async function fetchByType() {
+      setLoading(true);
       setError(null);
-      return;
+      try {
+        const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+        if (!res.ok) throw new Error("Failed to fetch Pokémon by type");
+        const data = await res.json();
+        setPokemon(data.pokemon.map((p: any) => p.pokemon));
+      } catch (err: any) {
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
     }
-    setLoading(true);
-    setError(null);
-    fetch(`https://pokeapi.co/api/v2/type/${type}`)
-      .then((res) => res.json())
-      .then((data: PokemonByTypeAPIResponse) => {
-        setPokemon(data.pokemon.map((p) => p.pokemon));
-      })
-      .catch(() => setError("Failed to fetch Pokémon by type"))
-      .finally(() => setLoading(false));
+    fetchByType();
   }, [type]);
 
   return { pokemon, loading, error };

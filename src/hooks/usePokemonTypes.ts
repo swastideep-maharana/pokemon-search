@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 
-export interface PokemonType {
-  name: string;
-  url: string;
-}
-
-interface PokemonTypesAPIResponse {
-  results: PokemonType[];
-}
-
 export function usePokemonTypes() {
-  const [types, setTypes] = useState<PokemonType[]>([]);
+  const [types, setTypes] = useState<{ name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,10 +11,11 @@ export function usePokemonTypes() {
       setError(null);
       try {
         const res = await fetch("https://pokeapi.co/api/v2/type");
-        const data: PokemonTypesAPIResponse = await res.json();
+        if (!res.ok) throw new Error("Failed to fetch types");
+        const data = await res.json();
         setTypes(data.results);
-      } catch {
-        setError("Failed to fetch types");
+      } catch (err: any) {
+        setError(err.message || "Unknown error");
       } finally {
         setLoading(false);
       }

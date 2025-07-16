@@ -1,31 +1,26 @@
 import { useEffect, useState } from "react";
 
-export interface PokemonDetails {
-  name: string;
-  sprites: { front_default: string };
-  types: { type: { name: string } }[];
-  stats: { stat: { name: string }; base_stat: number }[];
-}
-
 export function usePokemonDetails(name: string) {
-  const [details, setDetails] = useState<PokemonDetails | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [details, setDetails] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!name) {
-      setDetails(null);
-      setLoading(false);
+    async function fetchDetails() {
+      setLoading(true);
       setError(null);
-      return;
+      try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+        if (!res.ok) throw new Error("Failed to fetch Pokémon details");
+        const data = await res.json();
+        setDetails(data);
+      } catch (err: any) {
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
     }
-    setLoading(true);
-    setError(null);
-    fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
-      .then((res) => res.json())
-      .then((data: PokemonDetails) => setDetails(data))
-      .catch(() => setError("Failed to fetch Pokémon details"))
-      .finally(() => setLoading(false));
+    if (name) fetchDetails();
   }, [name]);
 
   return { details, loading, error };

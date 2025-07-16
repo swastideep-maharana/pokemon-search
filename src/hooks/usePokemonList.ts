@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 
-export interface PokemonListItem {
-  name: string;
-  url: string;
-}
-
-interface PokemonListAPIResponse {
-  results: PokemonListItem[];
-}
-
-export function usePokemonList(limit: number = 50, offset: number = 0) {
-  const [pokemon, setPokemon] = useState<PokemonListItem[]>([]);
+export function usePokemonList(limit: number, offset: number) {
+  const [pokemon, setPokemon] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,10 +13,11 @@ export function usePokemonList(limit: number = 50, offset: number = 0) {
         const res = await fetch(
           `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
         );
-        const data: PokemonListAPIResponse = await res.json();
+        if (!res.ok) throw new Error("Failed to fetch Pokémon");
+        const data = await res.json();
         setPokemon(data.results);
-      } catch {
-        setError("Failed to fetch Pokémon list");
+      } catch (err: any) {
+        setError(err.message || "Unknown error");
       } finally {
         setLoading(false);
       }
