@@ -8,11 +8,11 @@ async function getPokemonDetails(name: string) {
   return res.json();
 }
 
-export default async function PokemonDetailPage({
-  params,
-}: {
+interface PageProps {
   params: { name: string };
-}) {
+}
+
+export default async function PokemonDetailPage({ params }: PageProps) {
   const name = params.name;
   const details = await getPokemonDetails(name);
   if (!details) {
