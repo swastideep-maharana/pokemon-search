@@ -1,14 +1,19 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-async function getPokemonDetails(name) {
+async function getPokemonDetails(name: string) {
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
   if (!res.ok) return null;
   return res.json();
 }
 
-export default async function PokemonDetailPage({ params }) {
-  const name = await params.name;
+export default async function PokemonDetailPage({
+  params,
+}: {
+  params: { name: string };
+}) {
+  const name = params.name;
   const details = await getPokemonDetails(name);
   if (!details) {
     return (
@@ -57,15 +62,17 @@ export default async function PokemonDetailPage({ params }) {
           ← Back to Home
         </Link>
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow">
-          <img
+          <Image
             src={details.sprites?.front_default}
             alt={details.name}
+            width={128}
+            height={128}
             className="w-32 h-32 mb-4"
-            loading="lazy"
+            unoptimized
           />
           <h2 className="capitalize text-3xl font-bold mb-2">{details.name}</h2>
           <div className="flex gap-2 mb-4">
-            {details.types.map((t) => (
+            {details.types.map((t: { type: { name: string } }) => (
               <span
                 key={t.type.name}
                 className="px-3 py-1 rounded-full bg-yellow-300 text-gray-900 text-xs font-semibold capitalize"
@@ -77,16 +84,18 @@ export default async function PokemonDetailPage({ params }) {
           <div className="w-full">
             <h3 className="font-semibold mb-2">Stats</h3>
             <ul className="grid grid-cols-2 gap-2">
-              {details.stats.map((s) => (
-                <li key={s.stat.name} className="flex justify-between">
-                  <span className="capitalize text-gray-700 dark:text-gray-200">
-                    {s.stat.name}
-                  </span>
-                  <span className="font-mono font-bold text-gray-900 dark:text-white">
-                    {s.base_stat}
-                  </span>
-                </li>
-              ))}
+              {details.stats.map(
+                (s: { stat: { name: string }; base_stat: number }) => (
+                  <li key={s.stat.name} className="flex justify-between">
+                    <span className="capitalize text-gray-700 dark:text-gray-200">
+                      {s.stat.name}
+                    </span>
+                    <span className="font-mono font-bold text-gray-900 dark:text-white">
+                      {s.base_stat}
+                    </span>
+                  </li>
+                )
+              )}
             </ul>
           </div>
         </div>

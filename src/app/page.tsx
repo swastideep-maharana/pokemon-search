@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { usePokemonTypes } from "@/hooks/usePokemonTypes";
 import { usePokemonList } from "@/hooks/usePokemonList";
 import { usePokemonByType } from "@/hooks/usePokemonByType";
@@ -63,11 +64,13 @@ export default function Home() {
                   className="bg-yellow-100 dark:bg-yellow-700 rounded-lg p-2 flex flex-col items-center shadow min-w-[100px] cursor-pointer hover:bg-yellow-200 dark:hover:bg-yellow-600 transition"
                   onClick={() => router.push(`/pokemon/${poke.name}`)}
                 >
-                  <img
+                  <Image
                     src={getSpriteUrl(poke.url)}
                     alt={poke.name}
+                    width={40}
+                    height={40}
                     className="w-10 h-10 mb-1"
-                    loading="lazy"
+                    unoptimized
                   />
                   <span className="capitalize font-semibold text-sm">
                     {poke.name}
@@ -147,11 +150,13 @@ export default function Home() {
               >
                 ★
               </button>
-              <img
+              <Image
                 src={getSpriteUrl(poke.url)}
                 alt={poke.name}
+                width={64}
+                height={64}
                 className="w-16 h-16 mb-2"
-                loading="lazy"
+                unoptimized
               />
               <span className="capitalize font-semibold text-lg">
                 {poke.name}
